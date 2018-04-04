@@ -82,14 +82,13 @@ CONDA_ENV_DIRECTORY="/exports/igmm/eddie/Drug-Discovery/$PERSON/cellprofler_cond
 
 if [ -d "$CONDA_ENV_DIRECTORY" ]
 then
-    echo "Error: $CONDA_ENV_DIRECTORY already exists"
-    exit 1
+    rm -rf "$CONDA_ENV_DIRECTORY"
 fi
 
-mkdir /exports/igmm/eddie/Drug-Discovery/$PERSON/cellprofiler_conda_env
+mkdir "$CONDA_ENV_DIRECTORY"
 
 # move to the newly created directory
-cd /exports/igmm/eddie/Drug-Discovery/$PERSON/cellprofiler_conda_env
+cd "$CONDA_ENV_DIRECTORY"
 
 
 
@@ -103,6 +102,7 @@ channels:
     - anaconda
     - bjornfjohansson # for wxpython on linux
     - bioconda
+    - cyclus
     - conda-forge # for mahotas
 dependencies:
     - appdirs
@@ -132,7 +132,7 @@ dependencies:
     - scipy
     - sphinx
     - tifffile
-    - wxpython
+    - wxpython=3.0.2.0
     - pip:
          - cellh5
          - centrosome
@@ -142,6 +142,10 @@ dependencies:
          - python-bioformats==1.4.0
          - git+https://github.com/Swarchal/CellProfiler.git@master # CellProfiler fork frozen at version 3.1.3
 EOT
+
+# fix JAVA_HOME so javabridge points to where anaconda's java install is going to be
+CONDA_ENV_PREFIX=/exports/igmm/eddie/Drug-Discovery/$PERSON/.conda_envs/cellprofiler
+export JAVA_HOME=$CONDA_ENV_PREFIX
 
 # call conda to create this environment from the environment.yml
 conda env create -f environment.yml
