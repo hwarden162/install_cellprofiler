@@ -28,26 +28,34 @@
 
 # this makes sure ctrl-c properly stops the script
 trap "exit" INT
-
-# exit the install script if anything fails
 set -e
-
+# exit the install script if anything fails
 
 # load anaconda
 module load anaconda/5.0.1
 
+ENV_NAME=cellprofiler
+GROUP_NAME=igmm_datastore_Drug-Discovery
+DRUG_DISCOVERY_PREFIX=/exports/igmm/eddie/Drug-Discovery
 
-# get user, and set correct directory name in Drug-Discovery
-if [ $USER == "s1117349" ]
+# check user is in the Drug-Discovery group
+if groups "$USER" | grep -qw "$GROUP_NAME"
 then
-    PERSON="Becka"
-elif [ $USER == "s1027820" ]
-then
-    PERSON="scott"
+    # get user, and set correct directory name in Drug-Discovery
+    if [ $USER == "s1117349" ]
+    then
+        PERSON="Becka"
+    elif [ $USER == "s1027820" ]
+    then
+        PERSON="scott"
+    else
+        echo "ERROR: unknown user, cannot set correct directory in $DRUG_DISCOVERY_PREFIX"
+        echo "Change this script to match \$USER with what your directory in"
+        echo "$DRUG_DISCOVERY_PREFIX is called"
+        exit 1
+    fi
 else
-    echo "ERROR: unknown user, cannot set correct directory in /exports/igmm/eddie/Drug-Discovery"
-    echo "Change this script to match \$USER with what your directory in"
-    echo "/exports/igmm/eddie/Drug-Discovery is called"
+    echo "$USER not found in Drug-Discovery group, exiting"
     exit 1
 fi
 
@@ -56,16 +64,18 @@ fi
 # set up conda env to save packages in Drug-Discovery, not the in the home
 # directory -- otherwise we run out of space
 # create a .condarc file in your home directory
+# create directories for conda
+
+CONDA_PKGS=""$DRUG_DISCOVERY_PREFIX"/"$PERSON"/.conda_pkgs"
+CONDA_ENVS=""$DRUG_DISCOVERY_PREFIX"/"$PERSON"/.conda_envs"
+
 cat <<EOT >> ~/.condarc
 pkgs_dirs:
-    - /exports/igmm/eddie/Drug-Discovery/$PERSON/.conda_pkgs
+    - $CONDA_PKGS
 envs_dirs:
-    - /exports/igmm/eddie/Drug-Discovery/$PERSON/.conda_envs
+    - $CONDA_ENVS
 EOT
 
-# create directories for conda
-CONDA_PKGS="/exports/igmm/eddie/Drug-Discovery/$PERSON/.conda_pkgs"
-CONDA_ENVS="/exports/igmm/eddie/Drug-Discovery/$PERSON/.conda_envs"
 
 if [ ! -d "$CONDA_PKGS" ]
 then
@@ -78,16 +88,15 @@ then
 fi
 
 # create new directory to store the environment
-CONDA_ENV_DIRECTORY="/exports/igmm/eddie/Drug-Discovery/$PERSON/cellprofler_conda_env"
+CONDA_ENV_DIRECTORY=""$DRUG_DISCOVERY_PREFIX"/$PERSON/"$ENV_NAME"_conda_env"
 
 if [ -d "$CONDA_ENV_DIRECTORY" ]
 then
+    echo "Warning: replacing $CONDA_ENV_DIRECTORY"
     rm -rf "$CONDA_ENV_DIRECTORY"
 fi
 
 mkdir "$CONDA_ENV_DIRECTORY"
-
-# move to the newly created directory
 cd "$CONDA_ENV_DIRECTORY"
 
 
@@ -95,14 +104,15 @@ cd "$CONDA_ENV_DIRECTORY"
 # create an environment file and save it as 'environment.yml'
 # in the current directory
 cat <<EOT >> environment.yml
-# to remove run: conda env remove -n cellprofiler
-name: cellprofiler
+# to remove run: conda env remove -n $ENV_NAME
+name: $ENV_NAME
 # in order of priority: lowest (top) to highest (bottom)
 channels:
     - anaconda
+    - goodman
     - bjornfjohansson # for wxpython on linux
     - bioconda
-    - cyclus
+    - cyclus # for java stuff
     - conda-forge # for mahotas
 dependencies:
     - appdirs
@@ -144,7 +154,7 @@ dependencies:
 EOT
 
 # fix JAVA_HOME so javabridge points to where anaconda's java install is going to be
-CONDA_ENV_PREFIX=/exports/igmm/eddie/Drug-Discovery/$PERSON/.conda_envs/cellprofiler
+CONDA_ENV_PREFIX="$CONDA_ENVS"/"$ENV_NAME"
 export JAVA_HOME=$CONDA_ENV_PREFIX
 
 # call conda to create this environment from the environment.yml
