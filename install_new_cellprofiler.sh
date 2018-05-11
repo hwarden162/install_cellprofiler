@@ -150,7 +150,7 @@ dependencies:
          - prokaryote==2.3.3
          - javabridge==1.0.15
          - python-bioformats==1.4.0
-         - git+https://github.com/Swarchal/CellProfiler.git@master # CellProfiler fork frozen at version 3.1.3
+         - git+https://github.com/Swarchal/CellProfiler.git@master #CellProfiler fork frozen at version 3.0.0
 EOT
 
 # fix JAVA_HOME so javabridge points to where anaconda's java install is going to be
