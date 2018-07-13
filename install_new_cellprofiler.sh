@@ -41,36 +41,18 @@ DRUG_DISCOVERY_PREFIX=/exports/igmm/eddie/Drug-Discovery
 # check user is in the Drug-Discovery group
 if groups "$USER" | grep -qw "$GROUP_NAME"
 then
-    # get user, and set correct directory name in Drug-Discovery
-    if [ $USER == "s1117349" ]
-    then
-        PERSON="Becka"
-    elif [ $USER == "s1027820" ]
-    then
-        PERSON="scott"
-    elif [ $USER == "jdawson3" ]
-    then
-        PERSON="John"
-    else
-        echo "ERROR: unknown user, cannot set correct directory in $DRUG_DISCOVERY_PREFIX"
-        echo "Change this script to match \$USER with what your directory in"
-        echo "$DRUG_DISCOVERY_PREFIX is called"
-        exit 1
-    fi
+    # set up conda env to save packages in Drug-Discovery, not the in the home
+    # directory -- otherwise we run out of space
+    mkdir "$DRUG_DISCOVERY_PREFIX"/"$USER"
+    CONDA_PKGS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_pkgs"
+    CONDA_ENVS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_envs"
 else
     echo "$USER not found in Drug-Discovery group, exiting"
     exit 1
 fi
 
-
-
-# set up conda env to save packages in Drug-Discovery, not the in the home
-# directory -- otherwise we run out of space
 # create a .condarc file in your home directory
 # create directories for conda
-
-CONDA_PKGS=""$DRUG_DISCOVERY_PREFIX"/"$PERSON"/.conda_pkgs"
-CONDA_ENVS=""$DRUG_DISCOVERY_PREFIX"/"$PERSON"/.conda_envs"
 
 cat <<EOT >> ~/.condarc
 pkgs_dirs:
@@ -91,7 +73,7 @@ then
 fi
 
 # create new directory to store the environment
-CONDA_ENV_DIRECTORY=""$DRUG_DISCOVERY_PREFIX"/$PERSON/"$ENV_NAME"_conda_env"
+CONDA_ENV_DIRECTORY=""$DRUG_DISCOVERY_PREFIX"/$USER/"$ENV_NAME"_conda_env"
 
 if [ -d "$CONDA_ENV_DIRECTORY" ]
 then
