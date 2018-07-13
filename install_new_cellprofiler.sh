@@ -48,6 +48,9 @@ then
     elif [ $USER == "s1027820" ]
     then
         PERSON="scott"
+    elif [ $USER == "jdawson3" ]
+    then
+        PERSON="John"
     else
         echo "ERROR: unknown user, cannot set correct directory in $DRUG_DISCOVERY_PREFIX"
         echo "Change this script to match \$USER with what your directory in"
