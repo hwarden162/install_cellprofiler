@@ -32,7 +32,7 @@ set -e
 # exit the install script if anything fails
 
 # load anaconda
-module load anaconda
+module load anaconda/5.0.1
 
 ENV_NAME=cellprofiler
 GROUP_NAME=igmm_datastore_Drug-Discovery
@@ -63,6 +63,12 @@ CONDA_ENVS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_envs"
 # Append package and environment directory locations # to the .condarc file in
 # the user's home directory. This is used by anaconda as the location to store
 # dependencies and what not. If this is not set
+
+# create ~/.condarc file if it doesn't already exist
+if [ ! -f ~/.condarc  ]; then
+    touch ~/.condarc
+fi
+
 cat <<EOT >> ~/.condarc
 pkgs_dirs:
     - $CONDA_PKGS
@@ -110,14 +116,14 @@ cat <<EOT >> environment.yml
 # run: conda env update -f environment.yml
 # run: conda env remove -n cellprofiler
 name: cellprofiler
-# in order of priority: lowest (top) to highest (bottom)
+# in order of priority: highest (top) to lowest (bottom)
 channels:
+    - conda-forge
     - anaconda
     - goodman # mysql-python for mac
     - bjornfjohansson
     - bioconda
     - cyclus # java-jdk for windows
-    - conda-forge # libxml2 for windows
 dependencies:
     - appdirs
     - cython=0.28.5
