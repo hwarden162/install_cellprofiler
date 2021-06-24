@@ -124,6 +124,7 @@ channels:
     - bjornfjohansson
     - bioconda
     - cyclus # java-jdk for windows
+    - daf # wxpython for linux
 dependencies:
     - appdirs
     - cython=0.28.5
