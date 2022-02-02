@@ -35,17 +35,18 @@ set -e
 module load anaconda/5.0.1
 
 ENV_NAME=cellprofiler
-GROUP_NAME=igmm_datastore_Drug-Discovery
-DRUG_DISCOVERY_PREFIX=/exports/igmm/eddie/Drug-Discovery
+GROUP_NAME=igmm_datastore_kudla-lab
+KUDLA_LAB_PREFIX=/exports/igmm/eddie/kudla-lab/
+USER = "Hugh"
 
 # check user is in the Drug-Discovery group
 if groups "$USER" | grep -qw "$GROUP_NAME"
 then
-    if [ ! -d "DRUG_DISCOVERY_PREFIX"/"$USER" ]; then
-        mkdir "$DRUG_DISCOVERY_PREFIX"/"$USER"
+    if [ ! -d "KUDLA_LAB_PREFIX"/"$USER" ]; then
+        mkdir "$KUDLA_LAB_PREFIX"/"$USER"
     fi
-    CONDA_PKGS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_pkgs"
-    CONDA_ENVS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_envs"
+    CONDA_PKGS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_pkgs"
+    CONDA_ENVS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_envs"
 else
     echo "$USER not found in Drug-Discovery group, exiting"
     exit 1
@@ -57,8 +58,8 @@ fi
 # directory -- otherwise we run out of space
 
 # create paths to locations in Drug-Discovery/$USER
-CONDA_PKGS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_pkgs"
-CONDA_ENVS=""$DRUG_DISCOVERY_PREFIX"/"$USER"/.conda_envs"
+CONDA_PKGS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_pkgs"
+CONDA_ENVS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_envs"
 
 # Append package and environment directory locations # to the .condarc file in
 # the user's home directory. This is used by anaconda as the location to store
@@ -82,17 +83,17 @@ EOT
 # don't yet exist then these are created
 if [ ! -d "$CONDA_PKGS" ]
 then
-    mkdir "$CONDA_PKGS"
+    mkdir -p "$CONDA_PKGS"
 fi
 
 if [ ! -d "$CONDA_ENVS" ]
 then
-    mkdir "$CONDA_ENVS"
+    mkdir -p "$CONDA_ENVS"
 fi
 
 # Create new directory to store the environment. This environment is
 # unique to the user's CellProfiler installation.
-CONDA_ENV_DIRECTORY=""$DRUG_DISCOVERY_PREFIX"/$USER/"$ENV_NAME"_conda_env"
+CONDA_ENV_DIRECTORY=""$KUDLA_LAB_PREFIX"/$USER/Conda/"$ENV_NAME"_conda_env"
 
 if [ -d "$CONDA_ENV_DIRECTORY" ]
 then
@@ -100,7 +101,7 @@ then
     rm -rf "$CONDA_ENV_DIRECTORY"
 fi
 
-mkdir "$CONDA_ENV_DIRECTORY"
+mkdir -p "$CONDA_ENV_DIRECTORY"
 cd "$CONDA_ENV_DIRECTORY"
 
 
