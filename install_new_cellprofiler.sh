@@ -3,6 +3,7 @@
 ################################################################################
 ######### Script to install cellprofiler into an anaconda environment. #########
 ################################################################################
+# *****Forked from the drug discovery repo*****
 #
 # Need to run this in qlogin session, with around 8GB of memory:
 #
@@ -36,28 +37,23 @@ module load anaconda/5.0.1
 
 ENV_NAME=cellprofiler
 GROUP_NAME=igmm_datastore_kudla-lab
-KUDLA_LAB_PREFIX=/exports/igmm/eddie/kudla-lab/
+KUDLA_LAB_PREFIX=/exports/igmm/eddie/kudla-lab
+#***CHANGEME*** Change this to whatever your folder inside the kudla-lab labspace is called
 USER = "Hugh"
 
-# check user is in the Drug-Discovery group
-if groups "$USER" | grep -qw "$GROUP_NAME"
-then
-    if [ ! -d "KUDLA_LAB_PREFIX"/"$USER" ]; then
-        mkdir "$KUDLA_LAB_PREFIX"/"$USER"
-    fi
-    CONDA_PKGS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_pkgs"
-    CONDA_ENVS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_envs"
-else
-    echo "$USER not found in Drug-Discovery group, exiting"
-    exit 1
+if [ ! -d "KUDLA_LAB_PREFIX"/"$USER" ]; then
+    mkdir -p "$KUDLA_LAB_PREFIX"/"$USER"
 fi
+CONDA_PKGS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_pkgs"
+CONDA_ENVS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_envs"
 
 
 
-# set up conda env to save packages in Drug-Discovery, not the in the home
+
+# set up conda env to save packages in kudla-lab, not the in the home
 # directory -- otherwise we run out of space
 
-# create paths to locations in Drug-Discovery/$USER
+# create paths to locations in kudla-lab/$USER
 CONDA_PKGS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_pkgs"
 CONDA_ENVS=""$KUDLA_LAB_PREFIX"/"$USER"/Conda/conda_envs"
 
@@ -78,8 +74,8 @@ envs_dirs:
 EOT
 
 # If the anaconda package and environment directories:
-#      /exports/eddie/Drug-Discovery/$USER/.conda_pkgs
-#      /exports/eddie/Drug-Discovery/$USER/.conda_envs
+#      /exports/eddie/kudla-lab/$USER/Conda/conda_pkgs
+#      /exports/eddie/kudla-lab/$USER/Conda/conda_envs
 # don't yet exist then these are created
 if [ ! -d "$CONDA_PKGS" ]
 then
